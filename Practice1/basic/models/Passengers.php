@@ -47,7 +47,7 @@ class Passengers extends \yii\db\ActiveRecord
             'id' => 'ID',
             'snp' => 'Snp',
             'telephone_numb' => 'Telephone Numb',
-            'age' => 'Age',
+            'age' => 'Passenger Age',
             'baggage_weight' => 'Baggage Weight',
         ];
     }

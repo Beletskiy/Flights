@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\Tickets;
+use app\models\Passengers;
 
 /**
  * This is the model class for table "tickets".
@@ -12,10 +14,11 @@ use Yii;
  * @property integer $flight_id
  * @property integer $place_id
  * @property string $date
+ * @property integer $price
  *
- * @property Place $place
  * @property Passengers $passenger
  * @property Flights $flight
+ * @property Place $place
  */
 class Tickets extends \yii\db\ActiveRecord
 {
@@ -33,8 +36,8 @@ class Tickets extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['passenger_id', 'flight_id', 'place_id', 'date'], 'required'],
-            [['passenger_id', 'flight_id', 'place_id'], 'integer'],
+            [['passenger_id', 'flight_id', 'place_id', 'date', 'price'], 'required'],
+            [['passenger_id', 'flight_id', 'place_id', 'price'], 'integer'],
             [['date'], 'safe']
         ];
     }
@@ -50,15 +53,8 @@ class Tickets extends \yii\db\ActiveRecord
             'flight_id' => 'Flight ID',
             'place_id' => 'Place ID',
             'date' => 'Date',
+            'price' => 'Price',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPlace()
-    {
-        return $this->hasOne(Place::className(), ['id' => 'place_id']);
     }
 
     /**
@@ -75,5 +71,43 @@ class Tickets extends \yii\db\ActiveRecord
     public function getFlight()
     {
         return $this->hasOne(Flights::className(), ['id' => 'flight_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlace()
+    {
+        return $this->hasOne(Place::className(), ['id' => 'place_id']);
+    }
+    
+    public function signup()
+    {
+     //  if ($this->validate()) {
+            $ticket = new Tickets();
+            $passenger = new Passengers();
+            
+            $passenger->save();
+          //  $ticket->flight_id = $this->flight_id;
+            $ticket->date = $this->date;
+         //   $user->setPassword($this->password);
+         // Yii::trace('!!!!!!!!pass!!!!!');
+          //  $user->generateAuthKey();
+          //  $user->accessToken= $this->name.'token';
+            
+        /*    Yii::$app->mailer->compose()
+            ->setFrom('Buzik1980@gmail.com')
+            ->setTo($user->email)
+            ->setSubject('You are registered on the site "xxx.xxx.xxx" ')
+            ->setTextBody('Hello, '.$user->name.'!
+                         You have successfully registered.
+                         Your login: '.$user->name.'. Your password: '.$this->password)        
+            ->send(); */
+            
+              if ($ticket->save($runValidation = false)) {
+                return $ticket;
+            } 
+      //  }
+        return null;
     }
 }

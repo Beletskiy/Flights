@@ -15,6 +15,8 @@ use Yii;
  */
 class Flights extends \yii\db\ActiveRecord
 {
+    
+
     /**
      * @inheritdoc
      */
