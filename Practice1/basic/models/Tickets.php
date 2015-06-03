@@ -84,12 +84,23 @@ class Tickets extends \yii\db\ActiveRecord
     public function signup()
     {
      //  if ($this->validate()) {
-            $ticket = new Tickets();
             $passenger = new Passengers();
+            Yii::trace($passenger->age);
+           // $passenger->age = $this->passenger->age;
+           
+         //   $passenger->save();
+             $passenger->save($runValidation = false);
+            $ticket = new Tickets();
+          //  $ticket->id = $ticket->getPassenger();
+         //   Yii::trace($passenger->id);
+            $ticket->passenger_id = $passenger->id;
             
-            $passenger->save();
-          //  $ticket->flight_id = $this->flight_id;
+            
             $ticket->date = $this->date;
+            
+            
+          //  $ticket->flight_id = $this->flight_id;
+            
          //   $user->setPassword($this->password);
          // Yii::trace('!!!!!!!!pass!!!!!');
           //  $user->generateAuthKey();
@@ -104,9 +115,10 @@ class Tickets extends \yii\db\ActiveRecord
                          Your login: '.$user->name.'. Your password: '.$this->password)        
             ->send(); */
             
-              if ($ticket->save($runValidation = false)) {
+            $ticket->save($runValidation = false);
+         /*     if ($ticket->save($runValidation = false)) {
                 return $ticket;
-            } 
+            } */
       //  }
         return null;
     }

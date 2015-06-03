@@ -6,7 +6,6 @@ use yii\helpers\ArrayHelper;
 use app\models\Flights;
 
 
-
 /* @var $this yii\web\View */
 /* @var $model app\models\Tickets */
 /* @var $form ActiveForm */
@@ -22,7 +21,7 @@ use app\models\Flights;
     
     <?= $form->field($model, 'date')->widget(\yii\jui\DatePicker::classname(), [
     //'language' => 'ru',
-    //'dateFormat' => 'yyyy-MM-dd',
+    'dateFormat' => 'yyyy-MM-dd',
     ]) ?>
     
     <?= $form->field($passengers, 'age') ?>

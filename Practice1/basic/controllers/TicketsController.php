@@ -16,6 +16,10 @@ class TicketsController extends \yii\web\Controller
                 'flights' => $flights,
                 'passengers' =>$passengers
             ]); */
+      //  $model->attributes = \Yii::$app->request->post();
+        
+        $passengers->load(Yii::$app->request->post());
+        Yii::trace($passengers->attributes);
         
         if ($model->load(Yii::$app->request->post())) {
             if ($model->signup()) {
