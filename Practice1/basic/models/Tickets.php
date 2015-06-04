@@ -84,16 +84,16 @@ class Tickets extends \yii\db\ActiveRecord
     public function signup()
     {
      //  if ($this->validate()) {
-            $passenger = new Passengers();
-            Yii::trace($passenger->age);
+       //     $passenger = new Passengers();
+         //   Yii::trace($passenger->age);
            // $passenger->age = $this->passenger->age;
            
          //   $passenger->save();
-             $passenger->save($runValidation = false);
+         //    $passenger->save($runValidation = false);
             $ticket = new Tickets();
           //  $ticket->id = $ticket->getPassenger();
          //   Yii::trace($passenger->id);
-            $ticket->passenger_id = $passenger->id;
+            $ticket->passenger_id = $passengers->id;
             
             
             $ticket->date = $this->date;
