@@ -17,6 +17,7 @@ use Yii;
  */
 class Passengers extends \yii\db\ActiveRecord
 {
+  //  public $age;
     /**
      * @inheritdoc
      */
