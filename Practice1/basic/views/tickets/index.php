@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use app\models\Flights;
-use app\models\Place;
+//use app\models\Place;
 
 
 /* @var $this yii\web\View */
@@ -17,7 +17,14 @@ use app\models\Place;
     <?php $form = ActiveForm::begin(); ?>
     
     <?=  $form->field($flights, 'route')->dropDownList(
-      ArrayHelper::map(Flights::find()->all(), 'route', 'route'),['prompt'=>'Select flight']) ?>
+      ArrayHelper::map(Flights::find()->all(), 'route', 'route'),
+            //[ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&{route:+$(this).val()},
+           [ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&route="+$(this).val()+"&class="+3+"&luggage="+1,
+             
+               function(data){
+                       $("#tickets-price").val( data );
+               });
+          ' , 'prompt'=>'Select flight' ]) ?>
     
     <?= $form->field($model, 'date')->widget(\yii\jui\DatePicker::classname(), [
     //'language' => 'ru',
@@ -25,7 +32,7 @@ use app\models\Place;
     ]) ?>
     
     <?= $form->field($passengers, 'age')->textInput
-          ([ 'onfocusout'=>'$.post("index.php?r=tickets/show-class&age='.'"+$(this).val(),
+          ([ 'onfocusout'=>'$.post("index.php?r=tickets/show-class&age="+$(this).val(),
                                              function(data){
                 $("#place-class").html( data );
                 });
@@ -33,9 +40,14 @@ use app\models\Place;
     
     <?= $form->field($place, 'class')->dropDownList(
        ['prompt' => 'select class'],
-         [ 'onfocusout'=>'$.post("index.php?r=tickets/show-place&class='.'"+$(this).val(),
+         [ 'onfocusout'=>'$.post("index.php?r=tickets/show-place&class="+$(this).val(),
                                              function(data){
                 $("#place-seat_num").html( data );
+                });
+                $.post("index.php?r=tickets/calculate-price&class="+$(this).val()+"&route="+100+"&luggage="+1,
+             
+                                             function(data){
+                $("#tickets-price").val( Number(data) + Number($("#tickets-price").val( )) );
                 });
           ' ]   )
         ->hint('You can not choose first class for person under 14 years') ?>
@@ -48,7 +60,14 @@ use app\models\Place;
     <?= $form->field($passengers, 'telephone_numb')
               ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'999-999-9999']) ?>
     
-    <?= $form->field($passengers, 'baggage_weight') ?>
+    <?= $form->field($passengers, 'baggage_weight')->textInput(
+           [ 'onfocusout'=>'$.post("index.php?r=tickets/calculate-price&luggage="+$(this).val()+"&class="+100+"&route="+100,
+             
+               function(data){
+                       $("#tickets-price").val( data );
+               });
+          ' ])
+            ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'999']) ?>
     
        
         <?= $form->field($model, 'price') ?>

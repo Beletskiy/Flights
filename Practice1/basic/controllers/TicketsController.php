@@ -49,6 +49,25 @@ class TicketsController extends \yii\web\Controller
        } 
     }
     
+    public function actionCalculatePrice($route,$class,$luggage)
+    {
+        Yii::trace($class); 
+        Yii::trace($route);
+        Yii::trace($luggage);
+        if ($route!=="100") {
+           $sql = "SELECT `cost_base` FROM `flights` WHERE `route` = '$route' ";
+           $price = Flights::findBySql($sql)->scalar();
+           return $price;
+    }
+    else {
+        if (($route == "100")&&($class == 1)){
+            return 200;
+        }
+        if (($route == "100")&&($class == 2)){
+            return 100;
+        }
+    }
+    }
     public function actionIndex()
     {
         $model = new Tickets();
@@ -66,7 +85,7 @@ class TicketsController extends \yii\web\Controller
             $flights->load(Yii::$app->request->post())&&
              $place->load(Yii::$app->request->post())){
             
-            Yii::trace($flights->attributes);
+         //   Yii::trace($flights->attributes);
           //  Yii::trace($passengers['age']);
            //  $passengers->age = $passengers['age'];
              
@@ -78,7 +97,7 @@ class TicketsController extends \yii\web\Controller
              $model->passenger_id = $passengers->id;
              $sql = "SELECT `id` FROM `flights` WHERE `route` = '".$flights['route']."'";
              $model->flight_id = Flights::findBySql($sql)->scalar();
-             Yii::trace($model->flight_id);
+         //    Yii::trace($model->flight_id);
              $model->save($runValidation = false);
              
                     return $this->goHome();
