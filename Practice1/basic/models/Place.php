@@ -44,7 +44,7 @@ class Place extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'class' => 'Class',
-            'seat_num' => 'Seat Num',
+            'seat_num' => 'Seat Number',
             'free' => 'Free',
         ];
     }
@@ -56,4 +56,4 @@ class Place extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Tickets::className(), ['place_id' => 'id']);
     }
-}
+    }

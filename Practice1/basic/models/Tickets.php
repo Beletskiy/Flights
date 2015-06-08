@@ -86,10 +86,12 @@ class Tickets extends \yii\db\ActiveRecord
      //  if ($this->validate()) {
             $passenger = new Passengers();
             Yii::trace($passenger->age);
-           // $passenger->age = $this->passenger->age;
            
          //   $passenger->save();
              $passenger->save($runValidation = false);
+             
+             $place = new Place();
+             
             $ticket = new Tickets();
           //  $ticket->id = $ticket->getPassenger();
          //   Yii::trace($passenger->id);
