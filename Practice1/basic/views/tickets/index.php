@@ -18,13 +18,12 @@ use app\models\Flights;
     
     <?=  $form->field($flights, 'route')->dropDownList(
       ArrayHelper::map(Flights::find()->all(), 'route', 'route'),
-            //[ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&{route:+$(this).val()},
-           [ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&route="+$(this).val()+"&class="+3+"&luggage="+1,
-             
+           [ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&route="+$(this).val()
+               +"&class="+0+"&baggage_weight="+0+"&age="+0,
                function(data){
                        $("#tickets-price").val( data );
-               });
-          ' , 'prompt'=>'Select flight' ]) ?>
+             });' ,
+               'prompt'=>'Select flight' ]) ?>
     
     <?= $form->field($model, 'date')->widget(\yii\jui\DatePicker::classname(), [
     //'language' => 'ru',
@@ -33,23 +32,26 @@ use app\models\Flights;
     
     <?= $form->field($passengers, 'age')->textInput
           ([ 'onfocusout'=>'$.post("index.php?r=tickets/show-class&age="+$(this).val(),
-                                             function(data){
+             function(data){
                 $("#place-class").html( data );
-                });
+             });
+             $.post("index.php?r=tickets/calculate-price&age="+$(this).val()
+             +"&route="+0+"&baggage_weight="+0+"&class="+0,
+             function(data){
+                $("#tickets-price").val( data );
+             });
           ' ]) ?>
     
     <?= $form->field($place, 'class')->dropDownList(
-       ['prompt' => 'select class'],
-         [ 'onfocusout'=>'$.post("index.php?r=tickets/show-place&class="+$(this).val(),
+          ['prompt' => 'select class'],
+         [ 'onchange'=>'$.post("index.php?r=tickets/show-place&class="+$(this).val(),
                                              function(data){
                 $("#place-seat_num").html( data );
                 });
-                $.post("index.php?r=tickets/calculate-price&class="+$(this).val()+"&route="+100+"&luggage="+1,
-             
-                                             function(data){
-                $("#tickets-price").val( Number(data) + Number($("#tickets-price").val( )) );
-                });
-          ' ]   )
+                $.post("index.php?r=tickets/calculate-price&class="+$(this).val()+"&route="+0+"&baggage_weight="+0+"&age="+0,
+                function(data){
+                          $("#tickets-price").val( data );
+                }); ' ])
         ->hint('You can not choose first class for person under 14 years') ?>
     
     <?= $form->field($place, 'seat_num')->dropDownList(
@@ -61,13 +63,15 @@ use app\models\Flights;
               ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'999-999-9999']) ?>
     
     <?= $form->field($passengers, 'baggage_weight')->textInput(
-           [ 'onfocusout'=>'$.post("index.php?r=tickets/calculate-price&luggage="+$(this).val()+"&class="+100+"&route="+100,
-             
+           [ 'onfocusout'=>'$.post("index.php?r=tickets/calculate-price&baggage_weight="+$(this).val()
+               +"&class="+0+"&route="+0+"&age="+0,
                function(data){
                        $("#tickets-price").val( data );
                });
           ' ])
-            ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'999']) ?>
+            ->widget(\yii\widgets\MaskedInput::className(),['mask' => '9',
+                   'clientOptions' => ['repeat' => 3, 'greedy' => false]])
+            ->hint('1 kg - 40 UAH')?>
     
        
         <?= $form->field($model, 'price') ?>

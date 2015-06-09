@@ -8,8 +8,17 @@ use app\models\Flights;
 use app\models\Passengers;
 use app\models\Place;
 
+//$session = Yii::$app->session;
+
 class TicketsController extends \yii\web\Controller
 {
+    
+     /*   public static $base_price;
+        public static $price_per_class;
+        public static $baggage_weight_cost;
+        public static $child_or_adult = 1;
+        public static $price; */
+        
     public function actionShowClass($age)
     {
       if ($age >= 14)
@@ -18,12 +27,14 @@ class TicketsController extends \yii\web\Controller
                 <option value="2">2</option>
                 <option value="3">3</option>'
           ; }
-      else return '<option value="">select class</option>
-                   <option value="2">2</option>
-                   <option value="3">3</option>';
+      else {return "<option value=''>select class</option>
+                   <option value='2'>2</option>
+                   <option value='3'>3</option>"; 
+           }
     }
     public function actionShowPlace($class)
     {
+      Yii::trace($class.'from action класс');   
      switch ($class){
          case 1: 
             $str ="";
@@ -49,24 +60,54 @@ class TicketsController extends \yii\web\Controller
        } 
     }
     
-    public function actionCalculatePrice($route,$class,$luggage)
+    public function actionCalculatePrice($route,$class,$baggage_weight,$age)
     {
-        Yii::trace($class); 
-        Yii::trace($route);
-        Yii::trace($luggage);
-        if ($route!=="100") {
-           $sql = "SELECT `cost_base` FROM `flights` WHERE `route` = '$route' ";
-           $price = Flights::findBySql($sql)->scalar();
-           return $price;
-    }
-    else {
-        if (($route == "100")&&($class == 1)){
-            return 200;
+        $session = Yii::$app->session;
+        
+        Yii::trace($class.'input класс'); 
+        Yii::trace($route.'input маршрут');
+        Yii::trace($baggage_weight.'input багаж');
+        Yii::trace($age.'input возраст');
+        $session['sprice_per_class'] = $price_per_class = 0;
+        $session['sbaggage_weight_cost'] = $baggage_weight_cost = 0;
+        $session['schild_or_adult'] = $child_or_adult =1;
+        
+        
+        if ($route!=="0") {
+            $sql = "SELECT `cost_base` FROM `flights` WHERE `route` = '$route' ";
+            $base_price = Flights::findBySql($sql)->scalar();
+            $session['sbase_price'] = $base_price;
+            
         }
-        if (($route == "100")&&($class == 2)){
-            return 100;
+        if ($class!=="0") {
+            if ($class == "1") {$price_per_class = 200;}
+            if ($class == "2") {$price_per_class = 100;}
+            if ($class == "3") {$price_per_class = 0;}
+            $session['sprice_per_class'] = $price_per_class;
         }
-    }
+        if ($baggage_weight!=="0") {
+            $baggage_weight_cost = $baggage_weight*40;
+            $session['sbaggage_weight_cost'] = $baggage_weight_cost;
+        }
+        if ($age!=="0") {
+            if ($age<=14) {$child_or_adult = 0.8;}
+            $session['schild_or_adult'] = $child_or_adult;
+        }
+      //  Yii::trace($child_or_adult.'возраст');
+        $base_price = $session['sbase_price'];
+        $price_per_class = $session['sprice_per_class'];
+        $baggage_weight_cost = $session['sbaggage_weight_cost'];
+        $child_or_adult = $session['schild_or_adult'];
+        
+        Yii::trace($base_price.'базовая цена'); 
+        Yii::trace($price_per_class.'цена за класс');
+        Yii::trace($baggage_weight_cost.'стоимость багажа');
+        Yii::trace($child_or_adult.'ребенок?взрослый');
+        
+        $price = ($base_price + $price_per_class + $baggage_weight_cost)*$child_or_adult;
+        Yii::trace($price.'выходная цена');
+        return $price;
+    
     }
     public function actionIndex()
     {
