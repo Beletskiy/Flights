@@ -5,8 +5,6 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use app\models\Flights;
 //use app\models\Place;
-
-
 /* @var $this yii\web\View */
 /* @var $model app\models\Tickets */
 /* @var $form ActiveForm */
@@ -14,19 +12,31 @@ use app\models\Flights;
 ?>
 <div class="tickets-index">
 
-    <?php $form = ActiveForm::begin(); ?>
-    
+    <?php $form = ActiveForm::begin([
+   /* 'id' => 'login-form', */
+    'options' => ['class' => 'form-horizontal'], 
+    'fieldConfig' => [
+        'template' => '{label}<div class="col-sm-5">{input}</div>{hint}<div class="col-sm-5">{error}</div>',
+        'labelOptions' => ['class' => 'col-sm-3 control-label'], 
+    ],
+    ]); ?>
+    <?php 
+    $session = Yii::$app->session;
+    unset($session['sbase_price']);
+    unset($session['sprice_per_class']);
+    unset($session['sbaggage_weight_cost']);
+    unset($session['schild_or_adult']);
+    ?>
     <?=  $form->field($flights, 'route')->dropDownList(
       ArrayHelper::map(Flights::find()->all(), 'route', 'route'),
            [ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&route="+$(this).val()
                +"&class="+0+"&baggage_weight="+0+"&age="+0,
                function(data){
                        $("#tickets-price").val( data );
-             });' ,
+                            });' ,
                'prompt'=>'Select flight' ]) ?>
     
     <?= $form->field($model, 'date')->widget(\yii\jui\DatePicker::classname(), [
-    //'language' => 'ru',
     'dateFormat' => 'yyyy-MM-dd',
     ]) ?>
     
@@ -44,7 +54,7 @@ use app\models\Flights;
     
     <?= $form->field($place, 'class')->dropDownList(
           ['prompt' => 'select class'],
-         [ 'onchange'=>'$.post("index.php?r=tickets/show-place&class="+$(this).val(),
+         [ 'onfocusout'=>'$.post("index.php?r=tickets/show-place&class="+$(this).val(),
                                              function(data){
                 $("#place-seat_num").html( data );
                 });
@@ -62,23 +72,23 @@ use app\models\Flights;
     <?= $form->field($passengers, 'telephone_numb')
               ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'999-999-9999']) ?>
     
-    <?= $form->field($passengers, 'baggage_weight')->textInput(
-           [ 'onfocusout'=>'$.post("index.php?r=tickets/calculate-price&baggage_weight="+$(this).val()
+    <?= $form->field($passengers, 'baggage_weight')->textInput
+            ([ 'onchange'=>'$.post("index.php?r=tickets/calculate-price&baggage_weight="+$(this).val()
                +"&class="+0+"&route="+0+"&age="+0,
                function(data){
                        $("#tickets-price").val( data );
                });
           ' ])
-            ->widget(\yii\widgets\MaskedInput::className(),['mask' => '9',
-                   'clientOptions' => ['repeat' => 3, 'greedy' => false]])
-            ->hint('1 kg - 40 UAH')?>
+          /*  ->widget(\yii\widgets\MaskedInput::className(),['mask' => '9',
+                   'clientOptions' => ['repeat' => 3, 'greedy' => false]])  */
+            ->hint('1 kg - 40 UAH') ?>
     
        
-        <?= $form->field($model, 'price') ?>
+        <?= $form->field($model, 'price')->textInput(['readonly' => true]) ?>
     
         <div class="form-group">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+            <?= Html::submitButton('Reserve a ticket', ['class' => 'btn btn-primary']) ?>
         </div>
     <?php ActiveForm::end(); ?>
-
+  
 </div><!-- tickets-index -->

@@ -8,17 +8,8 @@ use app\models\Flights;
 use app\models\Passengers;
 use app\models\Place;
 
-//$session = Yii::$app->session;
-
 class TicketsController extends \yii\web\Controller
 {
-    
-     /*   public static $base_price;
-        public static $price_per_class;
-        public static $baggage_weight_cost;
-        public static $child_or_adult = 1;
-        public static $price; */
-        
     public function actionShowClass($age)
     {
       if ($age >= 14)
@@ -34,7 +25,6 @@ class TicketsController extends \yii\web\Controller
     }
     public function actionShowPlace($class)
     {
-      Yii::trace($class.'from action класс');   
      switch ($class){
          case 1: 
             $str ="";
@@ -64,20 +54,10 @@ class TicketsController extends \yii\web\Controller
     {
         $session = Yii::$app->session;
         
-        Yii::trace($class.'input класс'); 
-        Yii::trace($route.'input маршрут');
-        Yii::trace($baggage_weight.'input багаж');
-        Yii::trace($age.'input возраст');
-        $session['sprice_per_class'] = $price_per_class = 0;
-        $session['sbaggage_weight_cost'] = $baggage_weight_cost = 0;
-        $session['schild_or_adult'] = $child_or_adult =1;
-        
-        
         if ($route!=="0") {
             $sql = "SELECT `cost_base` FROM `flights` WHERE `route` = '$route' ";
             $base_price = Flights::findBySql($sql)->scalar();
             $session['sbase_price'] = $base_price;
-            
         }
         if ($class!=="0") {
             if ($class == "1") {$price_per_class = 200;}
@@ -91,23 +71,16 @@ class TicketsController extends \yii\web\Controller
         }
         if ($age!=="0") {
             if ($age<=14) {$child_or_adult = 0.8;}
+            else {$child_or_adult = 1;}
             $session['schild_or_adult'] = $child_or_adult;
         }
-      //  Yii::trace($child_or_adult.'возраст');
         $base_price = $session['sbase_price'];
         $price_per_class = $session['sprice_per_class'];
         $baggage_weight_cost = $session['sbaggage_weight_cost'];
         $child_or_adult = $session['schild_or_adult'];
         
-        Yii::trace($base_price.'базовая цена'); 
-        Yii::trace($price_per_class.'цена за класс');
-        Yii::trace($baggage_weight_cost.'стоимость багажа');
-        Yii::trace($child_or_adult.'ребенок?взрослый');
-        
         $price = ($base_price + $price_per_class + $baggage_weight_cost)*$child_or_adult;
-        Yii::trace($price.'выходная цена');
         return $price;
-    
     }
     public function actionIndex()
     {
@@ -116,35 +89,56 @@ class TicketsController extends \yii\web\Controller
         $passengers = new Passengers();
         $place = new Place();
     
-      //  $model->attributes = \Yii::$app->request->post();
-        
-     /*   $passengers->load(Yii::$app->request->post());
-        Yii::trace($passengers->attributes); */
-        
         if ($model->load(Yii::$app->request->post()) && 
             $passengers->load(Yii::$app->request->post())&&
             $flights->load(Yii::$app->request->post())&&
              $place->load(Yii::$app->request->post())){
-            
-         //   Yii::trace($flights->attributes);
-          //  Yii::trace($passengers['age']);
-           //  $passengers->age = $passengers['age'];
+             $passengers->save();
              
-             $passengers->save($runValidation = false);
              $place->free = 0;
-             $place->save($runValidation = false);
+             $place->save();
              
              $model->place_id = $place->id;
              $model->passenger_id = $passengers->id;
              $sql = "SELECT `id` FROM `flights` WHERE `route` = '".$flights['route']."'";
              $model->flight_id = Flights::findBySql($sql)->scalar();
-         //    Yii::trace($model->flight_id);
-             $model->save($runValidation = false);
+             $model->save();
              
-                    return $this->goHome();
+                 //   return $this->goHome();
+             return $this->actionTicket();
             }
         
         return $this->render('index', [
+            'model' => $model,
+            'flights' => $flights,
+            'passengers' =>$passengers,
+            'place' => $place
+        ]);
+    }
+    public function actionTicket(){
+        
+        $model = new Tickets();
+        $flights = new Flights;
+        $passengers = new Passengers();
+        $place = new Place();
+        
+        $sql = 'SELECT * FROM `tickets` WHERE id = (SELECT MAX( `id` )FROM tickets) order by price';
+        $model = Tickets::findBySql($sql)->all();
+        
+        $sql1 = 'SELECT route FROM `flights` '
+                . 'WHERE id = (SELECT flight_id FROM tickets '
+                . 'WHERE id = (SELECT MAX( `id` )FROM tickets))';
+        $flights = Flights::findBySql($sql1)->scalar();
+        
+        $sql2 = 'SELECT * FROM `passengers` WHERE id = (SELECT MAX( `id` )FROM passengers)';
+        $passengers = Passengers::findBySql($sql2)->all();
+        
+        $sql3 = 'SELECT * FROM `place` WHERE id = (SELECT MAX( `id` )FROM place)';
+        $place = Place::findBySql($sql3)->all();
+        
+      //  Yii::trace($place); 
+        
+        return $this->render('ticket', [
             'model' => $model,
             'flights' => $flights,
             'passengers' =>$passengers,
