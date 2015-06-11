@@ -104,7 +104,6 @@ class TicketsController extends \yii\web\Controller
              $model->flight_id = Flights::findBySql($sql)->scalar();
              $model->save();
              
-                 //   return $this->goHome();
              return $this->actionTicket();
             }
         
@@ -135,9 +134,7 @@ class TicketsController extends \yii\web\Controller
         
         $sql3 = 'SELECT * FROM `place` WHERE id = (SELECT MAX( `id` )FROM place)';
         $place = Place::findBySql($sql3)->all();
-        
       //  Yii::trace($place); 
-        
         return $this->render('ticket', [
             'model' => $model,
             'flights' => $flights,

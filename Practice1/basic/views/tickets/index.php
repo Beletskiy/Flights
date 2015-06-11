@@ -13,7 +13,6 @@ use app\models\Flights;
 <div class="tickets-index">
 
     <?php $form = ActiveForm::begin([
-   /* 'id' => 'login-form', */
     'options' => ['class' => 'form-horizontal'], 
     'fieldConfig' => [
         'template' => '{label}<div class="col-sm-5">{input}</div>{hint}<div class="col-sm-5">{error}</div>',
